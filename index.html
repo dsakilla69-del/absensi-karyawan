@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Absensi Karyawan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .loader {
+            border-top-color: #3498db;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        select {
+            -webkit-appearance: none; -moz-appearance: none; appearance: none;
+            background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1.25em;
+        }
+        #video-container {
+            transform: scaleX(-1); /* Mirror effect for selfie */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 flex items-center justify-center min-h-screen">
+
+    <!-- Container Utama -->
+    <div class="container mx-auto p-4 md:p-8 max-w-2xl w-full">
+        <!-- Kartu Absensi -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+            <header class="text-center mb-8">
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-700">Absensi Karyawan</h1>
+                <p class="text-gray-500 mt-1">Politeknik Pariwisata Makassar</p>
+                <!-- Jam Real-time -->
+                <div id="clock" class="mt-4 text-lg font-semibold text-blue-600 bg-blue-50 p-3 rounded-lg border border-blue-200">
+                    Memuat waktu...
+                </div>
+            </header>
+
+            <main class="space-y-6">
+                <!-- Pilihan Nama & Info Lokasi Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Kolom Kiri: Input -->
+                    <div class="space-y-6">
+                         <div>
+                            <label for="employeeNameSelect" class="block text-sm font-medium text-gray-600 mb-2">Nama Karyawan</label>
+                            <select id="employeeNameSelect" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition bg-white">
+                                <option value="" disabled selected>-- Pilih Nama Anda --</option>
+                                <option value="MUH FIRZYAH MAULANA">MUH FIRZYAH MAULANA</option>
+                                <option value="Andriani Kartia">Andriani Kartia</option>
+                                <option value="ANI">ANI</option>
+                                <option value="Ansari Ikhwan">Ansari Ikhwan</option>
+                                <option value="HAMSAH">HAMSAH</option>
+                                <option value="MIRNAWATI">MIRNAWATI</option>
+                                <option value="BAKRI DAENG SEWANG">BAKRI DAENG SEWANG</option>
+                                <option value="JUNAEDI">JUNAEDI</option>
+                                <option value="ANDI SUDIRGA">ANDI SUDIRGA</option>
+                                <option value="DAHLAN DG REWA">DAHLAN DG REWA</option>
+                                <option value="sainuddin Dg nai">sainuddin Dg nai</option>
+                                <option value="ITA">ITA</option>
+                                <option value="Syamsuddin dg limpo">Syamsuddin dg limpo</option>
+                                <option value="SARINAH">SARINAH</option>
+                                <option value="RENALDO SAFARUDDIN ALI">RENALDO SAFARUDDIN ALI</option>
+                                <option value="jumariah dg suji">jumariah dg suji</option>
+                            </select>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <button id="clockInBtn" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition shadow-md flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed" disabled>Jam Datang</button>
+                            <button id="clockOutBtn" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded-lg transition shadow-md flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed" disabled>Jam Pulang</button>
+                        </div>
+                    </div>
+                    <!-- Kolom Kanan: Status -->
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="text-md font-semibold mb-3 text-gray-700">Status Absensi</h3>
+                        <div id="location-debug" class="space-y-1 text-xs text-gray-600">
+                            <p>Status GPS: <span id="locationStatus" class="font-medium text-yellow-600">Mencari...</span></p>
+                            <p>Jarak ke Lokasi: <span id="distanceStatus" class="font-medium text-yellow-600">-</span></p>
+                            <p>Status Absen: <span id="workLocationStatus" class="font-medium text-yellow-600">Memeriksa...</span></p>
+                            <hr class="my-2">
+                            <p class="font-semibold">Info Debug:</p>
+                            <p>Koordinat Anda: <span id="userCoords">-</span></p>
+                            <p>Koordinat Kantor: <span id="officeCoords">-</span></p>
+                        </div>
+                        <div id="locationError" class="text-red-600 mt-2 text-sm font-medium"></div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal Kamera -->
+    <div id="cameraModal" class="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white p-6 rounded-lg shadow-xl text-center max-w-lg w-full">
+            <h3 class="text-xl font-medium text-gray-700 mb-4">Ambil Foto Selfie</h3>
+            <div class="relative bg-black rounded-lg overflow-hidden w-full aspect-video mb-4">
+                 <video id="video-container" class="w-full h-full object-cover" autoplay playsinline></video>
+                 <canvas id="canvas" class="hidden"></canvas>
+            </div>
+            <div class="flex gap-4">
+                <button id="captureBtn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg transition">Ambil Gambar</button>
+                <button id="cancelBtn" class="w-full bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-4 rounded-lg transition">Batal</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Loading -->
+    <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+        <div class="bg-white p-8 rounded-lg shadow-xl text-center max-w-sm w-full mx-4">
+            <div id="loader" class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4 mx-auto"></div>
+            <h3 id="message" class="text-lg font-medium text-gray-700"></h3>
+        </div>
+    </div>
+
+    <script>
+        // --- PENGATURAN ---
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJhVWfNY2CWlEx8c2kTON7ejmcXYz3jNqYkbd7znhmOrybrp1De8mYEp4zv62MqtCg_g/exec";
+        // Koordinat diperbarui sesuai permintaan
+        const OFFICE_LATITUDE = -5.188724546311627;
+        const OFFICE_LONGITUDE = 119.39487657300862;
+        const ALLOWED_RADIUS_METERS = 1500; 
+        // --- AKHIR PENGATURAN ---
+
+        const employeeNameSelect = document.getElementById('employeeNameSelect');
+        const clockInBtn = document.getElementById('clockInBtn');
+        const clockOutBtn = document.getElementById('clockOutBtn');
+        const clockEl = document.getElementById('clock');
+        
+        const locationStatus = document.getElementById('locationStatus');
+        const workLocationStatus = document.getElementById('workLocationStatus');
+        const locationError = document.getElementById('locationError');
+        const distanceStatus = document.getElementById('distanceStatus');
+        const userCoords = document.getElementById('userCoords');
+        const officeCoords = document.getElementById('officeCoords');
+        
+        const cameraModal = document.getElementById('cameraModal');
+        const video = document.getElementById('video-container');
+        const canvas = document.getElementById('canvas');
+        const captureBtn = document.getElementById('captureBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        
+        const overlay = document.getElementById('overlay');
+        const message = document.getElementById('message');
+
+        let currentCoordinates = null;
+        let isLocationValid = false;
+        let currentStream;
+        let attendanceStatus;
+        
+        function updateClock() {
+            const now = new Date();
+            const options = {
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+                hour: '2-digit', minute: '2-digit', second: '2-digit',
+                timeZone: 'Asia/Makassar',
+                hour12: false
+            };
+            clockEl.textContent = new Intl.DateTimeFormat('id-ID', options).format(now);
+        }
+
+        function getDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371e3;
+            const toRad = (v) => v * Math.PI / 180;
+            const dLat = toRad(lat2 - lat1);
+            const dLon = toRad(lon2 - lon1);
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        }
+
+        function initLocation() {
+            officeCoords.textContent = `${OFFICE_LATITUDE.toFixed(4)}, ${OFFICE_LONGITUDE.toFixed(4)}`;
+
+            if (!navigator.geolocation) {
+                locationStatus.textContent = 'Tidak Didukung Browser';
+                locationStatus.className = 'font-medium text-red-600';
+                return;
+            }
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    currentCoordinates = { latitude: position.coords.latitude, longitude: position.coords.longitude };
+                    userCoords.textContent = `${currentCoordinates.latitude.toFixed(4)}, ${currentCoordinates.longitude.toFixed(4)}`;
+                    
+                    locationStatus.textContent = 'Ditemukan';
+                    locationStatus.className = 'font-medium text-green-600';
+                    const distance = getDistance(currentCoordinates.latitude, currentCoordinates.longitude, OFFICE_LATITUDE, OFFICE_LONGITUDE);
+                    
+                    distanceStatus.textContent = `${distance.toFixed(0)} meter`;
+                    
+                    if (distance <= ALLOWED_RADIUS_METERS) {
+                        isLocationValid = true;
+                        workLocationStatus.textContent = `Di Dalam Area Kerja`;
+                        workLocationStatus.className = 'font-medium text-green-600';
+                        clockInBtn.disabled = false; clockOutBtn.disabled = false;
+                        locationError.textContent = '';
+                    } else {
+                        isLocationValid = false;
+                        workLocationStatus.textContent = `Di Luar Area Kerja`;
+                        workLocationStatus.className = 'font-medium text-red-600';
+                        locationError.textContent = `Anda harus berada dalam radius ${ALLOWED_RADIUS_METERS}m dari kantor.`;
+                    }
+                },
+                (error) => {
+                    locationStatus.textContent = 'Gagal';
+                    locationStatus.className = 'font-medium text-red-600';
+                    let errorMsg = 'Gagal mendapat lokasi. Aktifkan GPS dan izinkan akses.';
+                    if(error.code === 1) { // PERMISSION_DENIED
+                        errorMsg = 'Akses lokasi ditolak. Mohon izinkan di pengaturan browser Anda.'
+                    }
+                    locationError.textContent = errorMsg;
+                },
+                { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+            );
+        }
+
+        async function openCamera() {
+            try {
+                currentStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+                video.srcObject = currentStream;
+                cameraModal.classList.remove('hidden');
+            } catch (err) {
+                alert('Gagal mengakses kamera. Mohon izinkan akses kamera pada browser Anda.');
+            }
+        }
+        
+        function closeCamera() {
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => track.stop());
+            }
+            cameraModal.classList.add('hidden');
+        }
+
+        async function submitAttendance(selfieData) {
+            showOverlay('Mengirim data absensi...');
+            const payload = {
+                employeeName: employeeNameSelect.value,
+                status: attendanceStatus,
+                latitude: currentCoordinates.latitude,
+                longitude: currentCoordinates.longitude,
+                selfie: selfieData.split(',')[1] // Kirim hanya data base64
+            };
+            
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST', body: JSON.stringify(payload),
+                    headers: { "Content-Type": "text/plain;charset=utf-8" }
+                });
+                const result = await response.json();
+                if (result.status === "success") {
+                    showOverlayMessage('Absensi berhasil terkirim!');
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                showOverlayMessage(`Error: ${error.message}`, true);
+            } finally {
+                employeeNameSelect.value = '';
+                setTimeout(hideOverlay, 2000);
+            }
+        }
+        
+        function setupAttendance(status) {
+            const employeeName = employeeNameSelect.value;
+            if (!employeeName) {
+                alert('Silakan pilih nama Anda.'); return;
+            }
+            if (!isLocationValid) {
+                alert('Anda tidak berada di lokasi kerja yang diizinkan.'); return;
+            }
+            attendanceStatus = status;
+            openCamera();
+        }
+
+        function showOverlay(msg) {
+            message.textContent = msg;
+            overlay.classList.remove('hidden');
+        }
+        function showOverlayMessage(msg, isError = false) {
+            message.textContent = msg;
+            message.className = `text-lg font-medium ${isError ? 'text-red-600' : 'text-gray-700'}`;
+            document.getElementById('loader').style.display = 'none';
+        }
+        function hideOverlay() {
+            overlay.classList.add('hidden');
+             document.getElementById('loader').style.display = 'block';
+        }
+
+        // Event Listeners
+        clockInBtn.addEventListener('click', () => setupAttendance('Jam Datang'));
+        clockOutBtn.addEventListener('click', () => setupAttendance('Jam Pulang'));
+        captureBtn.addEventListener('click', () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const context = canvas.getContext('2d');
+            context.scale(-1, 1); // Flip horizontally for correct orientation
+            context.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+            closeCamera();
+            submitAttendance(dataUrl);
+        });
+        cancelBtn.addEventListener('click', closeCamera);
+
+        window.addEventListener('load', () => {
+             if (SCRIPT_URL.includes("GANTI_DENGAN")) {
+                alert("Konfigurasi belum selesai. Masukkan URL Web App Anda di variabel SCRIPT_URL.");
+             }
+            initLocation();
+            updateClock();
+            setInterval(updateClock, 1000); // Update jam setiap detik
+        });
+    </script>
+</body>
+</html>
+
