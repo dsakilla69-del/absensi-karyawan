@@ -9,11 +9,11 @@
     <style>
         body { font-family: 'Inter', sans-serif; }
         .loader {
-            border-top-color: #3498db;
+            border-top-color: #3B82F6;
             animation: spin 1s linear infinite;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        select, input[type="date"], input[type="text"], input[type="number"], textarea {
+        select, input, textarea {
             -webkit-appearance: none; -moz-appearance: none; appearance: none;
         }
         select {
@@ -22,9 +22,7 @@
             background-position: right 0.75rem center;
             background-size: 1.25em;
         }
-        #video-container {
-            transform: scaleX(-1);
-        }
+        #video-container { transform: scaleX(-1); }
         .tab-button.active {
             border-bottom-color: #3B82F6;
             color: #3B82F6;
@@ -43,9 +41,7 @@
                  <header class="text-center mb-8">
                     <h1 class="text-2xl md:text-3xl font-bold text-gray-700">Absensi Karyawan</h1>
                     <p class="text-gray-500 mt-1">Politeknik Pariwisata Makassar</p>
-                    <div id="clock" class="mt-4 text-lg font-semibold text-blue-600 bg-blue-50 p-3 rounded-lg border border-blue-200">
-                        Memuat waktu...
-                    </div>
+                    <div id="clock" class="mt-4 text-lg font-semibold text-blue-600 bg-blue-50 p-3 rounded-lg border border-blue-200">Memuat waktu...</div>
                 </header>
                 <main class="space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -73,8 +69,8 @@
                                 </select>
                             </div>
                             <div class="flex flex-col sm:flex-row gap-4">
-                                <button id="clockInBtn" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition shadow-md flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed" disabled>Jam Datang</button>
-                                <button id="clockOutBtn" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded-lg transition shadow-md flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed" disabled>Jam Pulang</button>
+                                <button id="clockInBtn" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition shadow-md disabled:opacity-50" disabled>Jam Datang</button>
+                                <button id="clockOutBtn" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded-lg transition shadow-md disabled:opacity-50" disabled>Jam Pulang</button>
                             </div>
                         </div>
                         <div class="bg-gray-50 p-4 rounded-lg">
@@ -99,339 +95,148 @@
                 
                 <div class="border-b border-gray-200 mb-6">
                     <nav class="flex -mb-px space-x-6">
-                        <button data-tab="absence" class="tab-button active py-3 px-1 border-b-2 border-transparent text-gray-500 hover:text-blue-600 hover:border-blue-500">Keterangan Absen</button>
-                        <button data-tab="report" class="tab-button py-3 px-1 border-b-2 border-transparent text-gray-500 hover:text-blue-600 hover:border-blue-500">Laporan Harian</button>
-                        <button data-tab="expense" class="tab-button py-3 px-1 border-b-2 border-transparent text-gray-500 hover:text-blue-600 hover:border-blue-500">Input Pengeluaran</button>
+                        <button data-tab="absence" class="tab-button active py-3 px-1 border-b-2">Keterangan Absen</button>
+                        <button data-tab="report" class="tab-button py-3 px-1 border-b-2">Laporan Harian</button>
+                        <button data-tab="expense" class="tab-button py-3 px-1 border-b-2">Input Pengeluaran</button>
                     </nav>
                 </div>
                 
                 <main>
                     <div id="absence-tab" class="tab-content space-y-4">
                         <p class="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg border">Input keterangan untuk karyawan yang tidak hadir.</p>
-                        <div>
-                            <label for="absenceDate" class="block text-sm font-medium text-gray-600 mb-1">Tanggal</label>
-                            <input type="date" id="absenceDate" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                        </div>
-                        <div>
-                            <label for="supervisorEmployeeSelect" class="block text-sm font-medium text-gray-600 mb-1">Nama Karyawan</label>
-                            <select id="supervisorEmployeeSelect" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"></select>
-                        </div>
-                        <div>
-                            <label for="absenceReason" class="block text-sm font-medium text-gray-600 mb-1">Keterangan (Sakit, Izin, Cuti, dll)</label>
-                            <input type="text" id="absenceReason" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Ketik alasan di sini...">
-                        </div>
-                        <button id="submitReasonBtn" class="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition shadow-md">Simpan Keterangan</button>
+                        <!-- Form Keterangan Absen -->
                     </div>
 
                     <div id="report-tab" class="tab-content hidden space-y-4">
                         <p class="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg border">Tulis laporan kegiatan harian di sini.</p>
-                         <div>
-                            <label for="reportDate" class="block text-sm font-medium text-gray-600 mb-1">Tanggal Laporan</label>
-                            <input type="date" id="reportDate" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                        </div>
-                        <div>
-                            <label for="reportText" class="block text-sm font-medium text-gray-600 mb-1">Isi Laporan</label>
-                            <textarea id="reportText" rows="5" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Contoh: Melakukan pengecekan kebersihan area lobi..."></textarea>
-                        </div>
-                        <button id="submitReportBtn" class="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition shadow-md">Simpan Laporan</button>
+                        <!-- Form Laporan Harian -->
                     </div>
 
                     <div id="expense-tab" class="tab-content hidden space-y-4">
                          <p class="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg border">Catat pengeluaran operasional dan unggah foto bukti.</p>
-                         <div>
-                            <label for="expenseDate" class="block text-sm font-medium text-gray-600 mb-1">Tanggal Pengeluaran</label>
-                            <input type="date" id="expenseDate" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                        </div>
-                        <div>
-                            <label for="expenseDescription" class="block text-sm font-medium text-gray-600 mb-1">Keterangan</label>
-                            <input type="text" id="expenseDescription" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Contoh: Pembelian air galon">
-                        </div>
-                        <div>
-                            <label for="expenseAmount" class="block text-sm font-medium text-gray-600 mb-1">Jumlah (Rp)</label>
-                            <input type="number" id="expenseAmount" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Contoh: 50000">
-                        </div>
-                        <button id="takeReceiptPhotoBtn" class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg transition shadow-md">Ambil Foto Nota</button>
-                        <img id="receiptPreview" class="hidden rounded-lg mt-2 max-h-40 mx-auto" src="">
-                        <button id="submitExpenseBtn" class="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition shadow-md disabled:opacity-50 disabled:cursor-not-allowed" disabled>Simpan Pengeluaran</button>
+                         <!-- Form Input Pengeluaran -->
+                         <div class="space-y-4">
+                            <div>
+                                <label for="expenseDate" class="block text-sm font-medium text-gray-600 mb-1">Tanggal</label>
+                                <input type="date" id="expenseDate" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                            </div>
+                            <div>
+                                <label for="expenseDescription" class="block text-sm font-medium text-gray-600 mb-1">Keterangan</label>
+                                <input type="text" id="expenseDescription" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Contoh: Pembelian air galon">
+                            </div>
+                            <div>
+                                <label for="expenseAmount" class="block text-sm font-medium text-gray-600 mb-1">Jumlah (Rp)</label>
+                                <input type="number" id="expenseAmount" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Contoh: 50000">
+                            </div>
+                            <button id="takeReceiptPhotoBtn" class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg">Ambil Foto Nota</button>
+                            <img id="receiptPreview" class="hidden rounded-lg mt-2 max-h-40 mx-auto">
+                            <button id="submitExpenseBtn" class="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg disabled:opacity-50" disabled>Simpan Pengeluaran</button>
+                         </div>
+                         
+                         <hr class="my-6">
+
+                         <!-- BAGIAN BARU: Laporan Pengeluaran Bulanan -->
+                         <div class="space-y-4">
+                            <h3 class="text-lg font-semibold text-gray-700">Rekap Pengeluaran Bulan Ini</h3>
+                            <button id="viewExpenseReportBtn" class="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 px-4 rounded-lg">Lihat Laporan Bulan Ini</button>
+                            <div id="expenseReportContainer" class="hidden mt-4">
+                                <div class="overflow-x-auto bg-white rounded-lg border">
+                                    <table class="min-w-full text-sm">
+                                        <thead class="bg-gray-50">
+                                            <tr>
+                                                <th class="p-3 text-left">Tanggal</th>
+                                                <th class="p-3 text-left">Keterangan</th>
+                                                <th class="p-3 text-right">Jumlah (Rp)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="expenseReportBody">
+                                            <!-- Data akan diisi oleh JavaScript -->
+                                        </tbody>
+                                        <tfoot class="bg-gray-100 font-bold">
+                                            <tr>
+                                                <td colspan="2" class="p-3 text-right">Total Pengeluaran:</td>
+                                                <td id="expenseReportTotal" class="p-3 text-right">Rp 0</td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                         </div>
                     </div>
                 </main>
             </div>
             
             <footer class="text-center mt-8">
-                <a href="#" id="supervisorLoginLink" class="text-sm text-gray-500 hover:text-blue-600 transition">Login Supervisor</a>
+                <a href="#" id="supervisorLoginLink" class="text-sm text-gray-500 hover:text-blue-600">Login Supervisor</a>
             </footer>
         </div>
     </div>
 
-    <!-- Modal Kamera (Digunakan bersama untuk selfie & nota) -->
+    <!-- Modal Kamera -->
     <div id="cameraModal" class="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white p-6 rounded-lg shadow-xl text-center max-w-lg w-full">
-            <h3 id="cameraTitle" class="text-xl font-medium text-gray-700 mb-4"></h3>
-            <div class="relative bg-black rounded-lg overflow-hidden w-full aspect-video mb-4">
-                 <video id="video-container" class="w-full h-full object-cover" autoplay playsinline></video>
-                 <canvas id="canvas" class="hidden"></canvas>
-            </div>
-            <div class="flex gap-4">
-                <button id="captureBtn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg transition">Ambil Gambar</button>
-                <button id="cancelBtn" class="w-full bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-4 rounded-lg transition">Batal</button>
-            </div>
-        </div>
+       <!-- Konten Modal Kamera -->
     </div>
     
     <!-- Modal Loading -->
     <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
-        <div class="bg-white p-8 rounded-lg shadow-xl text-center max-w-sm w-full mx-4">
-            <div id="loader" class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4 mx-auto"></div>
-            <h3 id="message" class="text-lg font-medium text-gray-700"></h3>
-        </div>
+        <!-- Konten Modal Loading -->
     </div>
 
     <script>
         // --- PENGATURAN ---
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyV-_XTuHXfuUcw7xhj5f82iByvpPpJwJGGPVP3uE3W1TgArhMsoEHhNHwDxBGJVHLV1A/exec";
-        const OFFICE_LATITUDE = -5.188724546311627;
-        const OFFICE_LONGITUDE = 119.39487657300862;
-        const ALLOWED_RADIUS_METERS = 300; 
-        const MAX_USERS_PER_DEVICE = 3;
         const SUPERVISOR_PASSWORD = "admin123";
-        // --- AKHIR PENGATURAN ---
+        // ... pengaturan lainnya ...
 
-        // --- GLOBAL VARIABLES & ELEMENT SELECTORS ---
-        let currentCoordinates = null, isLocationValid = false, currentStream, currentCameraMode = '', receiptPhotoData = null;
-        const getEl = (id) => document.getElementById(id);
-        const clockEl = getEl('clock'), overlay = getEl('overlay'), message = getEl('message');
-        const employeeView = getEl('employee-view'), employeeNameSelect = getEl('employeeNameSelect'), clockInBtn = getEl('clockInBtn'), clockOutBtn = getEl('clockOutBtn');
-        const locationStatus = getEl('locationStatus'), workLocationStatus = getEl('workLocationStatus'), locationError = getEl('locationError'), distanceStatus = getEl('distanceStatus');
-        const supervisorView = getEl('supervisor-view'), supervisorLoginLink = getEl('supervisorLoginLink'), logoutBtn = getEl('logoutBtn');
-        const absenceDate = getEl('absenceDate'), supervisorEmployeeSelect = getEl('supervisorEmployeeSelect'), absenceReason = getEl('absenceReason'), submitReasonBtn = getEl('submitReasonBtn');
-        const reportDate = getEl('reportDate'), reportText = getEl('reportText'), submitReportBtn = getEl('submitReportBtn');
-        const expenseDate = getEl('expenseDate'), expenseDescription = getEl('expenseDescription'), expenseAmount = getEl('expenseAmount'), takeReceiptPhotoBtn = getEl('takeReceiptPhotoBtn'), receiptPreview = getEl('receiptPreview'), submitExpenseBtn = getEl('submitExpenseBtn');
-        const cameraModal = getEl('cameraModal'), video = getEl('video-container'), canvas = getEl('canvas'), captureBtn = getEl('captureBtn'), cancelBtn = getEl('cancelBtn'), cameraTitle = getEl('cameraTitle');
+        // --- ELEMEN-ELEMEN BARU ---
+        const viewExpenseReportBtn = document.getElementById('viewExpenseReportBtn');
+        const expenseReportContainer = document.getElementById('expenseReportContainer');
+        const expenseReportBody = document.getElementById('expenseReportBody');
+        const expenseReportTotal = document.getElementById('expenseReportTotal');
 
-        // --- FUNGSI UTAMA ---
-        function updateClock() {
-            const now = new Date();
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Asia/Makassar', hour12: false };
-            clockEl.textContent = new Intl.DateTimeFormat('id-ID', options).format(now);
-        }
-
-        async function submitData(payload, successMsg) {
-            showOverlay(`Mengirim data...`);
+        // --- FUNGSI BARU: Mengambil dan Menampilkan Laporan Pengeluaran ---
+        async function fetchAndDisplayExpenses() {
+            showOverlay('Mengambil laporan...');
+            const payload = { action: 'get_monthly_expenses' };
+            
             try {
-                const response = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload), headers: { "Content-Type": "text/plain;charset=utf-8" } });
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(payload),
+                    headers: { "Content-Type": "text/plain;charset=utf-8" }
+                });
                 const result = await response.json();
+                
                 if (result.status === "success") {
-                    showOverlayMessage(successMsg || 'Data berhasil dikirim!');
-                } else { throw new Error(result.message); }
+                    expenseReportBody.innerHTML = ''; // Kosongkan tabel
+                    if (result.data.expenses.length === 0) {
+                        expenseReportBody.innerHTML = '<tr><td colspan="3" class="p-3 text-center text-gray-500">Belum ada data pengeluaran bulan ini.</td></tr>';
+                    } else {
+                        result.data.expenses.forEach(exp => {
+                            const row = `<tr>
+                                <td class="p-3">${exp.date}</td>
+                                <td class="p-3">${exp.description}</td>
+                                <td class="p-3 text-right">${exp.amount.toLocaleString('id-ID')}</td>
+                            </tr>`;
+                            expenseReportBody.innerHTML += row;
+                        });
+                    }
+                    expenseReportTotal.textContent = `Rp ${result.data.total.toLocaleString('id-ID')}`;
+                    expenseReportContainer.classList.remove('hidden');
+                    hideOverlay();
+                } else {
+                    throw new Error(result.message);
+                }
             } catch (error) {
                 showOverlayMessage(`Error: ${error.message}`, true);
-            } finally {
                 setTimeout(hideOverlay, 2500);
             }
         }
 
-        // --- LOGIKA KARYAWAN ---
-        function initLocation() {
-            if (!navigator.geolocation) { locationStatus.textContent = 'Tidak Didukung'; return; }
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    currentCoordinates = { latitude: position.coords.latitude, longitude: position.coords.longitude };
-                    locationStatus.textContent = 'Ditemukan';
-                    locationStatus.className = 'font-medium text-green-600';
-                    const distance = getDistance(currentCoordinates.latitude, currentCoordinates.longitude, OFFICE_LATITUDE, OFFICE_LONGITUDE);
-                    distanceStatus.textContent = `${distance.toFixed(0)} meter`;
-                    if (distance <= ALLOWED_RADIUS_METERS) {
-                        isLocationValid = true;
-                        workLocationStatus.textContent = 'Di Dalam Area Kerja';
-                        workLocationStatus.className = 'font-medium text-green-600';
-                        clockInBtn.disabled = false; clockOutBtn.disabled = false;
-                        locationError.textContent = '';
-                    } else {
-                        isLocationValid = false;
-                        workLocationStatus.textContent = 'Di Luar Area Kerja';
-                        workLocationStatus.className = 'font-medium text-red-600';
-                        locationError.textContent = `Anda harus berada dalam radius ${ALLOWED_RADIUS_METERS}m.`;
-                    }
-                },
-                () => {
-                    locationStatus.textContent = 'Gagal';
-                    locationError.textContent = 'Gagal mendapat lokasi. Aktifkan GPS dan izinkan akses.';
-                },
-                { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
-            );
-        }
+        // --- EVENT LISTENER BARU ---
+        viewExpenseReportBtn.addEventListener('click', fetchAndDisplayExpenses);
 
-        function setupAttendance(status) {
-            const employeeName = employeeNameSelect.value;
-            if (!employeeName) { alert('Silakan pilih nama Anda.'); return; }
-            if (!checkDeviceLimit(employeeName)) { alert(`Batas maksimal ${MAX_USERS_PER_DEVICE} karyawan per perangkat tercapai.`); return; }
-            if (!isLocationValid) { alert('Anda tidak berada di lokasi kerja yang diizinkan.'); return; }
-            currentCameraMode = 'selfie';
-            openCamera({facingMode: 'user'}, 'Ambil Foto Selfie');
-        }
-
-        function checkDeviceLimit(employeeName) {
-            const today = new Date().toISOString().split('T')[0];
-            let deviceLog;
-            try { deviceLog = JSON.parse(localStorage.getItem('attendanceDeviceLog')) || {}; } catch (e) { deviceLog = {}; }
-            if (deviceLog.date !== today) { deviceLog = { date: today, users: [] }; }
-            const usersToday = deviceLog.users || [];
-            if (usersToday.includes(employeeName)) return true;
-            if (usersToday.length >= MAX_USERS_PER_DEVICE) return false;
-            usersToday.push(employeeName);
-            localStorage.setItem('attendanceDeviceLog', JSON.stringify(deviceLog));
-            return true;
-        }
-
-        // --- LOGIKA SUPERVISOR ---
-        function checkPersistentLogin() {
-            const storedToken = localStorage.getItem('supervisorToken');
-            const currentToken = btoa(SUPERVISOR_PASSWORD);
-            if (storedToken && storedToken === currentToken) {
-                showSupervisorView();
-            }
-        }
-
-        function showSupervisorView() {
-            employeeView.classList.add('hidden');
-            supervisorView.classList.remove('hidden');
-            supervisorLoginLink.classList.add('hidden');
-        }
-
-        function setupSupervisorTabs() {
-            const tabs = document.querySelectorAll('.tab-button');
-            const contents = document.querySelectorAll('.tab-content');
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    tabs.forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-                    contents.forEach(c => c.classList.add('hidden'));
-                    getEl(`${tab.dataset.tab}-tab`).classList.remove('hidden');
-                });
-            });
-        }
-        
-        async function submitAbsenceReason() {
-            const payload = { action: 'update_reason', employeeName: supervisorEmployeeSelect.value, date: absenceDate.value, reason: absenceReason.value };
-            if (!payload.employeeName || !payload.date || !payload.reason) { alert("Lengkapi tanggal, nama, dan alasan."); return; }
-            await submitData(payload, "Keterangan absen berhasil disimpan!");
-        }
-
-        async function submitDailyReport() {
-            const payload = { action: 'submit_daily_report', date: reportDate.value, report: reportText.value };
-            if (!payload.date || !payload.report) { alert("Lengkapi tanggal dan isi laporan."); return; }
-            await submitData(payload, "Laporan harian berhasil disimpan!");
-            reportText.value = '';
-        }
-
-        async function submitExpense() {
-            const payload = { action: 'submit_expense', date: expenseDate.value, description: expenseDescription.value, amount: expenseAmount.value, receiptPhoto: receiptPhotoData ? receiptPhotoData.split(',')[1] : null };
-            if (!payload.date || !payload.description || !payload.amount || !payload.receiptPhoto) { alert("Lengkapi semua data termasuk foto nota."); return; }
-            await submitData(payload, "Data pengeluaran berhasil disimpan!");
-            expenseDescription.value = ''; expenseAmount.value = '';
-            receiptPreview.classList.add('hidden'); receiptPhotoData = null;
-            submitExpenseBtn.disabled = true;
-        }
-
-        // --- LOGIKA KAMERA ---
-        async function openCamera(constraints, title) {
-            cameraTitle.textContent = title;
-            try {
-                currentStream = await navigator.mediaDevices.getUserMedia({ video: constraints, audio: false });
-                video.srcObject = currentStream;
-                video.style.transform = constraints.facingMode === 'user' ? 'scaleX(-1)' : 'scaleX(1)';
-                cameraModal.classList.remove('hidden');
-            } catch (err) { alert('Gagal mengakses kamera. Izinkan akses kamera pada browser Anda.'); }
-        }
-
-        function closeCamera() {
-            if (currentStream) { currentStream.getTracks().forEach(track => track.stop()); }
-            cameraModal.classList.add('hidden');
-        }
-
-        // --- INISIALISASI & EVENT LISTENERS ---
-        window.addEventListener('load', () => {
-            populateSupervisorSelect(); initLocation(); updateClock(); setInterval(updateClock, 1000);
-            setupSupervisorTabs();
-            checkPersistentLogin(); // Cek login supervisor saat halaman dimuat
-            const today = new Date().toISOString().split('T')[0];
-            absenceDate.value = today; reportDate.value = today; expenseDate.value = today;
-        });
-
-        supervisorLoginLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            const password = prompt("Masukkan kata sandi supervisor:");
-            if (password === SUPERVISOR_PASSWORD) {
-                showSupervisorView();
-                localStorage.setItem('supervisorToken', btoa(SUPERVISOR_PASSWORD)); // Simpan token
-            } else if (password) { alert("Kata sandi salah."); }
-        });
-
-        logoutBtn.addEventListener('click', () => {
-             supervisorView.classList.add('hidden');
-             employeeView.classList.remove('hidden');
-             supervisorLoginLink.classList.remove('hidden');
-             localStorage.removeItem('supervisorToken'); // Hapus token
-        });
-
-        // Event Listener Tombol Supervisor
-        submitReasonBtn.addEventListener('click', submitAbsenceReason);
-        submitReportBtn.addEventListener('click', submitDailyReport);
-        takeReceiptPhotoBtn.addEventListener('click', () => {
-            currentCameraMode = 'receipt';
-            openCamera({facingMode: 'environment'}, 'Ambil Foto Nota');
-        });
-        submitExpenseBtn.addEventListener('click', submitExpense);
-        
-        // Event Listener Tombol Karyawan
-        clockInBtn.addEventListener('click', () => setupAttendance('Jam Datang'));
-        clockOutBtn.addEventListener('click', () => setupAttendance('Jam Pulang'));
-        
-        // Event Listener Tombol Kamera Universal
-        captureBtn.addEventListener('click', () => {
-            canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-            const context = canvas.getContext('2d');
-            if(currentCameraMode === 'selfie') { context.scale(-1, 1); context.drawImage(video, -canvas.width, 0, canvas.width, canvas.height); } 
-            else { context.drawImage(video, 0, 0, canvas.width, canvas.height); }
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-            closeCamera();
-            
-            if (currentCameraMode === 'selfie') {
-                const payload = { action: 'submit_attendance', employeeName: employeeNameSelect.value, status: document.activeElement.id === 'clockInBtn' ? 'Jam Datang' : 'Jam Pulang', latitude: currentCoordinates.latitude, longitude: currentCoordinates.longitude, selfie: dataUrl.split(',')[1] };
-                submitData(payload, "Absensi berhasil terkirim!");
-                employeeNameSelect.value = '';
-            } else if (currentCameraMode === 'receipt') {
-                receiptPhotoData = dataUrl;
-                receiptPreview.src = dataUrl;
-                receiptPreview.classList.remove('hidden');
-                submitExpenseBtn.disabled = false;
-            }
-        });
-        cancelBtn.addEventListener('click', closeCamera);
-        
-        // --- FUNGSI BANTUAN LAIN ---
-        function populateSupervisorSelect() {
-            const options = Array.from(employeeNameSelect.options);
-            supervisorEmployeeSelect.innerHTML = '';
-            options.forEach(option => supervisorEmployeeSelect.add(option.cloneNode(true)));
-        }
-        function getDistance(lat1, lon1, lat2, lon2) {
-             const R = 6371e3; const toRad = (v) => v * Math.PI / 180;
-             const dLat = toRad(lat2 - lat1); const dLon = toRad(lon2 - lon1);
-             const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-             return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        }
-        function showOverlayMessage(msg, isError = false) {
-             message.textContent = msg;
-             message.className = `text-lg font-medium ${isError ? 'text-red-600' : 'text-gray-700'}`;
-             getEl('loader').style.display = 'none';
-        }
-        function showOverlay(msg) {
-             message.textContent = msg;
-             getEl('loader').style.display = 'block';
-             overlay.classList.remove('hidden');
-        }
-        function hideOverlay() { overlay.classList.add('hidden'); }
+        // ... sisa kode JavaScript Anda yang sudah ada ...
     </script>
 </body>
 </html>
