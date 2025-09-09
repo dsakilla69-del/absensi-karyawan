@@ -116,11 +116,12 @@
 
     <script>
         // --- PENGATURAN ---
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJhVWfNY2CWlEx8c2kTON7ejmcXYz3jNqYkbd7znhmOrybrp1De8mYEp4zv62MqtCg_g/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyNP4pe_O6fQwajJtPIeLNHcMYibWroIRhJv3RfOHWTaM1ejhJMTEu6lQpwyiQVkYALpw/exec";
         // Koordinat diperbarui sesuai permintaan
         const OFFICE_LATITUDE = -5.188724546311627;
         const OFFICE_LONGITUDE = 119.39487657300862;
-        const ALLOWED_RADIUS_METERS = 1500; 
+        const ALLOWED_RADIUS_METERS = 300; 
+        const MAX_USERS_PER_DEVICE = 3; // Batas maksimal pengguna per perangkat
         // --- AKHIR PENGATURAN ---
 
         const employeeNameSelect = document.getElementById('employeeNameSelect');
@@ -259,14 +260,59 @@
                 setTimeout(hideOverlay, 2000);
             }
         }
+
+        // FUNGSI BARU: Memeriksa batas penggunaan perangkat
+        function checkDeviceLimit(employeeName) {
+            const today = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+            let deviceLog;
+
+            try {
+                deviceLog = JSON.parse(localStorage.getItem('attendanceDeviceLog')) || {};
+            } catch (e) {
+                deviceLog = {};
+            }
+
+            // Jika log sudah usang (dari hari kemarin), reset log tersebut
+            if (deviceLog.date !== today) {
+                deviceLog = { date: today, users: [] };
+            }
+
+            const usersToday = deviceLog.users || [];
+
+            // Jika karyawan sudah pernah absen hari ini di perangkat ini, izinkan
+            if (usersToday.includes(employeeName)) {
+                return true;
+            }
+
+            // Jika karyawan baru mencoba absen dan kuota sudah penuh
+            if (usersToday.length >= MAX_USERS_PER_DEVICE) {
+                return false; // Batas tercapai
+            }
+
+            // Jika karyawan baru dan kuota masih ada, tambahkan ke log dan izinkan
+            usersToday.push(employeeName);
+            deviceLog.users = usersToday;
+            localStorage.setItem('attendanceDeviceLog', JSON.stringify(deviceLog));
+            return true;
+        }
         
         function setupAttendance(status) {
             const employeeName = employeeNameSelect.value;
             if (!employeeName) {
-                alert('Silakan pilih nama Anda.'); return;
+                alert('Silakan pilih nama Anda.'); 
+                return;
             }
+
+            // --- PEMERIKSAAN BARU DITAMBAHKAN DI SINI ---
+            if (!checkDeviceLimit(employeeName)) {
+                alert(`Batas maksimal ${MAX_USERS_PER_DEVICE} karyawan untuk absen di perangkat ini telah tercapai.`);
+                return;
+            }
+            // --- AKHIR DARI PEMERIKSAAN BARU ---
+
             if (!isLocationValid) {
-                alert('Anda tidak berada di lokasi kerja yang diizinkan.'); return;
+                alert('Anda tidak berada di lokasi kerja yang diizinkan.'); 
+                return;
             }
             attendanceStatus = status;
             openCamera();
@@ -302,7 +348,7 @@
         cancelBtn.addEventListener('click', closeCamera);
 
         window.addEventListener('load', () => {
-             if (SCRIPT_URL.includes("GANTI_DENGAN")) {
+             if (SCRIPT_URL === "") {
                 alert("Konfigurasi belum selesai. Masukkan URL Web App Anda di variabel SCRIPT_URL.");
              }
             initLocation();
