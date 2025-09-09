@@ -40,7 +40,6 @@
             
             <!-- Tampilan Karyawan (Default) -->
             <div id="employee-view">
-                <!-- Konten absensi karyawan yang sudah ada -->
                  <header class="text-center mb-8">
                     <h1 class="text-2xl md:text-3xl font-bold text-gray-700">Absensi Karyawan</h1>
                     <p class="text-gray-500 mt-1">Politeknik Pariwisata Makassar</p>
@@ -80,14 +79,10 @@
                         </div>
                         <div class="bg-gray-50 p-4 rounded-lg">
                             <h3 class="text-md font-semibold mb-3 text-gray-700">Status Absensi</h3>
-                            <div id="location-debug" class="space-y-1 text-xs text-gray-600">
+                            <div class="space-y-1 text-xs text-gray-600">
                                 <p>Status GPS: <span id="locationStatus" class="font-medium text-yellow-600">Mencari...</span></p>
-                                <p>Jarak ke Lokasi: <span id="distanceStatus" class="font-medium text-yellow-600">-</span></p>
-                                <p>Status Absen: <span id="workLocationStatus" class="font-medium text-yellow-600">Memeriksa...</span></p>
-                                <hr class="my-2">
-                                <p class="font-semibold">Info Debug:</p>
-                                <p>Koordinat Anda: <span id="userCoords">-</span></p>
-                                <p>Koordinat Kantor: <span id="officeCoords">-</span></p>
+                                <p>Jarak: <span id="distanceStatus" class="font-medium text-yellow-600">-</span></p>
+                                <p>Status: <span id="workLocationStatus" class="font-medium text-yellow-600">Memeriksa...</span></p>
                             </div>
                             <div id="locationError" class="text-red-600 mt-2 text-sm font-medium"></div>
                         </div>
@@ -102,7 +97,6 @@
                     <button id="logoutBtn" class="text-sm text-blue-600 hover:underline">Logout</button>
                 </header>
                 
-                <!-- Navigasi Tab -->
                 <div class="border-b border-gray-200 mb-6">
                     <nav class="flex -mb-px space-x-6">
                         <button data-tab="absence" class="tab-button active py-3 px-1 border-b-2 border-transparent text-gray-500 hover:text-blue-600 hover:border-blue-500">Keterangan Absen</button>
@@ -111,12 +105,9 @@
                     </nav>
                 </div>
                 
-                <!-- Konten Tab -->
                 <main>
-                    <!-- Tab Keterangan Absen -->
                     <div id="absence-tab" class="tab-content space-y-4">
-                        <p class="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg border">Input keterangan (Sakit, Izin, Cuti) untuk karyawan yang tidak hadir.</p>
-                        <!-- Form Keterangan Absen -->
+                        <p class="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg border">Input keterangan untuk karyawan yang tidak hadir.</p>
                         <div>
                             <label for="absenceDate" class="block text-sm font-medium text-gray-600 mb-1">Tanggal</label>
                             <input type="date" id="absenceDate" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
@@ -126,13 +117,12 @@
                             <select id="supervisorEmployeeSelect" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"></select>
                         </div>
                         <div>
-                            <label for="absenceReason" class="block text-sm font-medium text-gray-600 mb-1">Keterangan</label>
-                            <input type="text" id="absenceReason" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Contoh: Sakit karena demam">
+                            <label for="absenceReason" class="block text-sm font-medium text-gray-600 mb-1">Keterangan (Sakit, Izin, Cuti, dll)</label>
+                            <input type="text" id="absenceReason" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Ketik alasan di sini...">
                         </div>
                         <button id="submitReasonBtn" class="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition shadow-md">Simpan Keterangan</button>
                     </div>
 
-                    <!-- Tab Laporan Harian -->
                     <div id="report-tab" class="tab-content hidden space-y-4">
                         <p class="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg border">Tulis laporan kegiatan harian di sini.</p>
                          <div>
@@ -146,7 +136,6 @@
                         <button id="submitReportBtn" class="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition shadow-md">Simpan Laporan</button>
                     </div>
 
-                    <!-- Tab Input Pengeluaran -->
                     <div id="expense-tab" class="tab-content hidden space-y-4">
                          <p class="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg border">Catat pengeluaran operasional dan unggah foto bukti.</p>
                          <div>
@@ -207,33 +196,19 @@
         const SUPERVISOR_PASSWORD = "admin123";
         // --- AKHIR PENGATURAN ---
 
-        // --- GLOBAL VARIABLES ---
-        let currentCoordinates = null;
-        let isLocationValid = false;
-        let currentStream;
-        let currentCameraMode = ''; // 'selfie' atau 'receipt'
-        let receiptPhotoData = null;
-        let attendanceStatus = ''; // Menyimpan status 'Jam Datang' atau 'Jam Pulang'
-
-        // --- ELEMEN-ELEMEN ---
+        // --- GLOBAL VARIABLES & ELEMENT SELECTORS ---
+        let currentCoordinates = null, isLocationValid = false, currentStream, currentCameraMode = '', receiptPhotoData = null;
         const getEl = (id) => document.getElementById(id);
         const clockEl = getEl('clock'), overlay = getEl('overlay'), message = getEl('message');
-        
-        // Karyawan
         const employeeView = getEl('employee-view'), employeeNameSelect = getEl('employeeNameSelect'), clockInBtn = getEl('clockInBtn'), clockOutBtn = getEl('clockOutBtn');
-        const locationStatus = getEl('locationStatus'), workLocationStatus = getEl('workLocationStatus'), locationError = getEl('locationError'), distanceStatus = getEl('distanceStatus'), userCoords = getEl('userCoords'), officeCoords = getEl('officeCoords');
-
-        // Supervisor
+        const locationStatus = getEl('locationStatus'), workLocationStatus = getEl('workLocationStatus'), locationError = getEl('locationError'), distanceStatus = getEl('distanceStatus');
         const supervisorView = getEl('supervisor-view'), supervisorLoginLink = getEl('supervisorLoginLink'), logoutBtn = getEl('logoutBtn');
         const absenceDate = getEl('absenceDate'), supervisorEmployeeSelect = getEl('supervisorEmployeeSelect'), absenceReason = getEl('absenceReason'), submitReasonBtn = getEl('submitReasonBtn');
         const reportDate = getEl('reportDate'), reportText = getEl('reportText'), submitReportBtn = getEl('submitReportBtn');
         const expenseDate = getEl('expenseDate'), expenseDescription = getEl('expenseDescription'), expenseAmount = getEl('expenseAmount'), takeReceiptPhotoBtn = getEl('takeReceiptPhotoBtn'), receiptPreview = getEl('receiptPreview'), submitExpenseBtn = getEl('submitExpenseBtn');
-
-        // Kamera
         const cameraModal = getEl('cameraModal'), video = getEl('video-container'), canvas = getEl('canvas'), captureBtn = getEl('captureBtn'), cancelBtn = getEl('cancelBtn'), cameraTitle = getEl('cameraTitle');
 
         // --- FUNGSI UTAMA ---
-
         function updateClock() {
             const now = new Date();
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Asia/Makassar', hour12: false };
@@ -242,7 +217,6 @@
 
         async function submitData(payload, successMsg) {
             showOverlay(`Mengirim data...`);
-            console.log("Mengirim payload:", payload); // Log untuk debug
             try {
                 const response = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload), headers: { "Content-Type": "text/plain;charset=utf-8" } });
                 const result = await response.json();
@@ -250,7 +224,6 @@
                     showOverlayMessage(successMsg || 'Data berhasil dikirim!');
                 } else { throw new Error(result.message); }
             } catch (error) {
-                console.error("Error saat submit:", error); // Log untuk debug
                 showOverlayMessage(`Error: ${error.message}`, true);
             } finally {
                 setTimeout(hideOverlay, 2500);
@@ -258,16 +231,11 @@
         }
 
         // --- LOGIKA KARYAWAN ---
-
         function initLocation() {
-            officeCoords.textContent = `${OFFICE_LATITUDE.toFixed(4)}, ${OFFICE_LONGITUDE.toFixed(4)}`;
-            if (!navigator.geolocation) {
-                locationStatus.textContent = 'Tidak Didukung'; return;
-            }
+            if (!navigator.geolocation) { locationStatus.textContent = 'Tidak Didukung'; return; }
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     currentCoordinates = { latitude: position.coords.latitude, longitude: position.coords.longitude };
-                    userCoords.textContent = `${currentCoordinates.latitude.toFixed(4)}, ${currentCoordinates.longitude.toFixed(4)}`;
                     locationStatus.textContent = 'Ditemukan';
                     locationStatus.className = 'font-medium text-green-600';
                     const distance = getDistance(currentCoordinates.latitude, currentCoordinates.longitude, OFFICE_LATITUDE, OFFICE_LONGITUDE);
@@ -285,12 +253,9 @@
                         locationError.textContent = `Anda harus berada dalam radius ${ALLOWED_RADIUS_METERS}m.`;
                     }
                 },
-                (error) => {
+                () => {
                     locationStatus.textContent = 'Gagal';
-                    locationStatus.className = 'font-medium text-red-600';
-                    let errorMsg = 'Gagal mendapat lokasi. Aktifkan GPS dan izinkan akses.';
-                    if(error.code === 1) { errorMsg = 'Akses lokasi ditolak. Izinkan di pengaturan browser.' }
-                    locationError.textContent = errorMsg;
+                    locationError.textContent = 'Gagal mendapat lokasi. Aktifkan GPS dan izinkan akses.';
                 },
                 { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
             );
@@ -299,13 +264,8 @@
         function setupAttendance(status) {
             const employeeName = employeeNameSelect.value;
             if (!employeeName) { alert('Silakan pilih nama Anda.'); return; }
-            if (!checkDeviceLimit(employeeName)) {
-                alert(`Batas maksimal ${MAX_USERS_PER_DEVICE} karyawan per perangkat tercapai.`);
-                return;
-            }
+            if (!checkDeviceLimit(employeeName)) { alert(`Batas maksimal ${MAX_USERS_PER_DEVICE} karyawan per perangkat tercapai.`); return; }
             if (!isLocationValid) { alert('Anda tidak berada di lokasi kerja yang diizinkan.'); return; }
-            
-            attendanceStatus = status; // Simpan status absensi di variabel global
             currentCameraMode = 'selfie';
             openCamera({facingMode: 'user'}, 'Ambil Foto Selfie');
         }
@@ -316,14 +276,27 @@
             try { deviceLog = JSON.parse(localStorage.getItem('attendanceDeviceLog')) || {}; } catch (e) { deviceLog = {}; }
             if (deviceLog.date !== today) { deviceLog = { date: today, users: [] }; }
             const usersToday = deviceLog.users || [];
-            if (usersToday.includes(employeeName)) { return true; }
-            if (usersToday.length >= MAX_USERS_PER_DEVICE) { return false; }
+            if (usersToday.includes(employeeName)) return true;
+            if (usersToday.length >= MAX_USERS_PER_DEVICE) return false;
             usersToday.push(employeeName);
             localStorage.setItem('attendanceDeviceLog', JSON.stringify(deviceLog));
             return true;
         }
 
         // --- LOGIKA SUPERVISOR ---
+        function checkPersistentLogin() {
+            const storedToken = localStorage.getItem('supervisorToken');
+            const currentToken = btoa(SUPERVISOR_PASSWORD);
+            if (storedToken && storedToken === currentToken) {
+                showSupervisorView();
+            }
+        }
+
+        function showSupervisorView() {
+            employeeView.classList.add('hidden');
+            supervisorView.classList.remove('hidden');
+            supervisorLoginLink.classList.add('hidden');
+        }
 
         function setupSupervisorTabs() {
             const tabs = document.querySelectorAll('.tab-button');
@@ -339,52 +312,28 @@
         }
         
         async function submitAbsenceReason() {
-            const payload = {
-                action: 'update_reason',
-                employeeName: supervisorEmployeeSelect.value,
-                date: absenceDate.value,
-                reason: absenceReason.value
-            };
-            if (!payload.employeeName || !payload.date || !payload.reason) {
-                alert("Lengkapi tanggal, nama karyawan, dan keterangan."); return;
-            }
+            const payload = { action: 'update_reason', employeeName: supervisorEmployeeSelect.value, date: absenceDate.value, reason: absenceReason.value };
+            if (!payload.employeeName || !payload.date || !payload.reason) { alert("Lengkapi tanggal, nama, dan alasan."); return; }
             await submitData(payload, "Keterangan absen berhasil disimpan!");
         }
 
         async function submitDailyReport() {
-            const payload = {
-                action: 'submit_daily_report',
-                date: reportDate.value,
-                report: reportText.value
-            };
-            if (!payload.date || !payload.report) {
-                alert("Lengkapi tanggal dan isi laporan."); return;
-            }
+            const payload = { action: 'submit_daily_report', date: reportDate.value, report: reportText.value };
+            if (!payload.date || !payload.report) { alert("Lengkapi tanggal dan isi laporan."); return; }
             await submitData(payload, "Laporan harian berhasil disimpan!");
             reportText.value = '';
         }
 
         async function submitExpense() {
-            const payload = {
-                action: 'submit_expense',
-                date: expenseDate.value,
-                description: expenseDescription.value,
-                amount: expenseAmount.value,
-                receiptPhoto: receiptPhotoData ? receiptPhotoData.split(',')[1] : null
-            };
-            if (!payload.date || !payload.description || !payload.amount || !payload.receiptPhoto) {
-                alert("Lengkapi semua data termasuk foto nota."); return;
-            }
+            const payload = { action: 'submit_expense', date: expenseDate.value, description: expenseDescription.value, amount: expenseAmount.value, receiptPhoto: receiptPhotoData ? receiptPhotoData.split(',')[1] : null };
+            if (!payload.date || !payload.description || !payload.amount || !payload.receiptPhoto) { alert("Lengkapi semua data termasuk foto nota."); return; }
             await submitData(payload, "Data pengeluaran berhasil disimpan!");
-            expenseDescription.value = '';
-            expenseAmount.value = '';
-            receiptPreview.classList.add('hidden');
-            receiptPhotoData = null;
+            expenseDescription.value = ''; expenseAmount.value = '';
+            receiptPreview.classList.add('hidden'); receiptPhotoData = null;
             submitExpenseBtn.disabled = true;
         }
 
-        // --- LOGIKA KAMERA (DIPERBARUI) ---
-
+        // --- LOGIKA KAMERA ---
         async function openCamera(constraints, title) {
             cameraTitle.textContent = title;
             try {
@@ -401,72 +350,54 @@
         }
 
         // --- INISIALISASI & EVENT LISTENERS ---
-
         window.addEventListener('load', () => {
-             if (SCRIPT_URL.includes("GANTI_DENGAN")) {
-                alert("Konfigurasi belum selesai. Masukkan URL Web App Anda.");
-             }
-            populateSupervisorSelect();
-            initLocation();
-            updateClock();
-            setInterval(updateClock, 1000);
+            populateSupervisorSelect(); initLocation(); updateClock(); setInterval(updateClock, 1000);
             setupSupervisorTabs();
-            // Set default date untuk input supervisor
+            checkPersistentLogin(); // Cek login supervisor saat halaman dimuat
             const today = new Date().toISOString().split('T')[0];
-            absenceDate.value = today;
-            reportDate.value = today;
-            expenseDate.value = today;
+            absenceDate.value = today; reportDate.value = today; expenseDate.value = today;
         });
 
-        // Event Listener Karyawan
-        clockInBtn.addEventListener('click', () => setupAttendance('Jam Datang'));
-        clockOutBtn.addEventListener('click', () => setupAttendance('Jam Pulang'));
-        
-        // Event Listener Supervisor
         supervisorLoginLink.addEventListener('click', (e) => {
             e.preventDefault();
             const password = prompt("Masukkan kata sandi supervisor:");
             if (password === SUPERVISOR_PASSWORD) {
-                employeeView.classList.add('hidden');
-                supervisorView.classList.remove('hidden');
-                supervisorLoginLink.classList.add('hidden');
+                showSupervisorView();
+                localStorage.setItem('supervisorToken', btoa(SUPERVISOR_PASSWORD)); // Simpan token
             } else if (password) { alert("Kata sandi salah."); }
         });
+
         logoutBtn.addEventListener('click', () => {
              supervisorView.classList.add('hidden');
              employeeView.classList.remove('hidden');
              supervisorLoginLink.classList.remove('hidden');
+             localStorage.removeItem('supervisorToken'); // Hapus token
         });
+
+        // Event Listener Tombol Supervisor
         submitReasonBtn.addEventListener('click', submitAbsenceReason);
         submitReportBtn.addEventListener('click', submitDailyReport);
         takeReceiptPhotoBtn.addEventListener('click', () => {
             currentCameraMode = 'receipt';
-            openCamera({facingMode: 'environment'}, 'Ambil Foto Nota'); // Kamera belakang
+            openCamera({facingMode: 'environment'}, 'Ambil Foto Nota');
         });
         submitExpenseBtn.addEventListener('click', submitExpense);
-
+        
+        // Event Listener Tombol Karyawan
+        clockInBtn.addEventListener('click', () => setupAttendance('Jam Datang'));
+        clockOutBtn.addEventListener('click', () => setupAttendance('Jam Pulang'));
+        
         // Event Listener Tombol Kamera Universal
         captureBtn.addEventListener('click', () => {
             canvas.width = video.videoWidth; canvas.height = video.videoHeight;
             const context = canvas.getContext('2d');
-            if(currentCameraMode === 'selfie') {
-                 context.scale(-1, 1);
-                 context.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
-            } else {
-                 context.drawImage(video, 0, 0, canvas.width, canvas.height);
-            }
+            if(currentCameraMode === 'selfie') { context.scale(-1, 1); context.drawImage(video, -canvas.width, 0, canvas.width, canvas.height); } 
+            else { context.drawImage(video, 0, 0, canvas.width, canvas.height); }
             const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
             closeCamera();
             
             if (currentCameraMode === 'selfie') {
-                const payload = {
-                    action: 'submit_attendance',
-                    employeeName: employeeNameSelect.value, 
-                    status: attendanceStatus, // DIPERBAIKI: Menggunakan variabel global
-                    latitude: currentCoordinates.latitude, 
-                    longitude: currentCoordinates.longitude,
-                    selfie: dataUrl.split(',')[1]
-                };
+                const payload = { action: 'submit_attendance', employeeName: employeeNameSelect.value, status: document.activeElement.id === 'clockInBtn' ? 'Jam Datang' : 'Jam Pulang', latitude: currentCoordinates.latitude, longitude: currentCoordinates.longitude, selfie: dataUrl.split(',')[1] };
                 submitData(payload, "Absensi berhasil terkirim!");
                 employeeNameSelect.value = '';
             } else if (currentCameraMode === 'receipt') {
@@ -478,13 +409,11 @@
         });
         cancelBtn.addEventListener('click', closeCamera);
         
-        // Helper Functions
+        // --- FUNGSI BANTUAN LAIN ---
         function populateSupervisorSelect() {
             const options = Array.from(employeeNameSelect.options);
             supervisorEmployeeSelect.innerHTML = '';
-            options.forEach(option => {
-                supervisorEmployeeSelect.add(option.cloneNode(true));
-            });
+            options.forEach(option => supervisorEmployeeSelect.add(option.cloneNode(true)));
         }
         function getDistance(lat1, lon1, lat2, lon2) {
              const R = 6371e3; const toRad = (v) => v * Math.PI / 180;
@@ -497,10 +426,12 @@
              message.className = `text-lg font-medium ${isError ? 'text-red-600' : 'text-gray-700'}`;
              getEl('loader').style.display = 'none';
         }
-        function hideOverlay() {
-             overlay.classList.add('hidden');
+        function showOverlay(msg) {
+             message.textContent = msg;
              getEl('loader').style.display = 'block';
+             overlay.classList.remove('hidden');
         }
+        function hideOverlay() { overlay.classList.add('hidden'); }
     </script>
 </body>
 </html>
