@@ -40,6 +40,7 @@
             
             <!-- Tampilan Karyawan (Default) -->
             <div id="employee-view">
+                <!-- Konten absensi karyawan yang sudah ada -->
                  <header class="text-center mb-8">
                     <h1 class="text-2xl md:text-3xl font-bold text-gray-700">Absensi Karyawan</h1>
                     <p class="text-gray-500 mt-1">Politeknik Pariwisata Makassar</p>
@@ -200,7 +201,7 @@
 
     <script>
         // --- PENGATURAN ---
-        const SCRIPT_URL = "GANTI_DENGAN_URL_SCRIPT_BARU_ANDA";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyV-_XTuHXfuUcw7xhj5f82iByvpPpJwJGGPVP3uE3W1TgArhMsoEHhNHwDxBGJVHLV1A/exec";
         const OFFICE_LATITUDE = -5.188724546311627;
         const OFFICE_LONGITUDE = 119.39487657300862;
         const ALLOWED_RADIUS_METERS = 300; 
@@ -316,7 +317,6 @@
             if (usersToday.includes(employeeName)) { return true; }
             if (usersToday.length >= MAX_USERS_PER_DEVICE) { return false; }
             usersToday.push(employeeName);
-            deviceLog.users = usersToday;
             localStorage.setItem('attendanceDeviceLog', JSON.stringify(deviceLog));
             return true;
         }
