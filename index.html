@@ -127,9 +127,7 @@
                         </div>
                         <div>
                             <label for="absenceReason" class="block text-sm font-medium text-gray-600 mb-1">Keterangan</label>
-                            <select id="absenceReason" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white">
-                                <option value="Sakit">Sakit</option><option value="Izin">Izin</option><option value="Cuti">Cuti</option><option value="Dinas Luar">Dinas Luar</option>
-                            </select>
+                            <input type="text" id="absenceReason" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Contoh: Sakit karena demam">
                         </div>
                         <button id="submitReasonBtn" class="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition shadow-md">Simpan Keterangan</button>
                     </div>
@@ -215,6 +213,7 @@
         let currentStream;
         let currentCameraMode = ''; // 'selfie' atau 'receipt'
         let receiptPhotoData = null;
+        let attendanceStatus = ''; // Menyimpan status 'Jam Datang' atau 'Jam Pulang'
 
         // --- ELEMEN-ELEMEN ---
         const getEl = (id) => document.getElementById(id);
@@ -243,6 +242,7 @@
 
         async function submitData(payload, successMsg) {
             showOverlay(`Mengirim data...`);
+            console.log("Mengirim payload:", payload); // Log untuk debug
             try {
                 const response = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload), headers: { "Content-Type": "text/plain;charset=utf-8" } });
                 const result = await response.json();
@@ -250,6 +250,7 @@
                     showOverlayMessage(successMsg || 'Data berhasil dikirim!');
                 } else { throw new Error(result.message); }
             } catch (error) {
+                console.error("Error saat submit:", error); // Log untuk debug
                 showOverlayMessage(`Error: ${error.message}`, true);
             } finally {
                 setTimeout(hideOverlay, 2500);
@@ -304,6 +305,7 @@
             }
             if (!isLocationValid) { alert('Anda tidak berada di lokasi kerja yang diizinkan.'); return; }
             
+            attendanceStatus = status; // Simpan status absensi di variabel global
             currentCameraMode = 'selfie';
             openCamera({facingMode: 'user'}, 'Ambil Foto Selfie');
         }
@@ -343,8 +345,8 @@
                 date: absenceDate.value,
                 reason: absenceReason.value
             };
-            if (!payload.employeeName || !payload.date) {
-                alert("Lengkapi tanggal dan nama karyawan."); return;
+            if (!payload.employeeName || !payload.date || !payload.reason) {
+                alert("Lengkapi tanggal, nama karyawan, dan keterangan."); return;
             }
             await submitData(payload, "Keterangan absen berhasil disimpan!");
         }
@@ -457,11 +459,12 @@
             closeCamera();
             
             if (currentCameraMode === 'selfie') {
-                const attendanceStatus = document.activeElement.id === 'clockInBtn' ? 'Jam Datang' : 'Jam Pulang';
                 const payload = {
                     action: 'submit_attendance',
-                    employeeName: employeeNameSelect.value, status: attendanceStatus,
-                    latitude: currentCoordinates.latitude, longitude: currentCoordinates.longitude,
+                    employeeName: employeeNameSelect.value, 
+                    status: attendanceStatus, // DIPERBAIKI: Menggunakan variabel global
+                    latitude: currentCoordinates.latitude, 
+                    longitude: currentCoordinates.longitude,
                     selfie: dataUrl.split(',')[1]
                 };
                 submitData(payload, "Absensi berhasil terkirim!");
