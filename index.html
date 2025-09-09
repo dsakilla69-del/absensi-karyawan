@@ -32,11 +32,9 @@
 </head>
 <body class="bg-gray-100 text-gray-800 flex items-center justify-center min-h-screen py-8">
 
-    <!-- Container Utama -->
     <div class="container mx-auto p-4 md:p-8 max-w-2xl w-full">
         <div id="main-card" class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
             
-            <!-- Tampilan Karyawan (Default) -->
             <div id="employee-view">
                  <header class="text-center mb-8">
                     <h1 class="text-2xl md:text-3xl font-bold text-gray-700">Absensi Karyawan</h1>
@@ -86,7 +84,6 @@
                 </main>
             </div>
 
-            <!-- Tampilan Supervisor (Tersembunyi) -->
             <div id="supervisor-view" class="hidden">
                 <header class="mb-6 flex justify-between items-center">
                     <h1 class="text-2xl font-bold text-gray-700">Dasbor Supervisor</h1>
@@ -104,17 +101,36 @@
                 <main>
                     <div id="absence-tab" class="tab-content space-y-4">
                         <p class="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg border">Input keterangan untuk karyawan yang tidak hadir.</p>
-                        <!-- Form Keterangan Absen -->
+                        <div>
+                            <label for="absenceDate" class="block text-sm font-medium text-gray-600 mb-1">Tanggal</label>
+                            <input type="date" id="absenceDate" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label for="supervisorEmployeeSelect" class="block text-sm font-medium text-gray-600 mb-1">Nama Karyawan</label>
+                            <select id="supervisorEmployeeSelect" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"></select>
+                        </div>
+                        <div>
+                            <label for="absenceReason" class="block text-sm font-medium text-gray-600 mb-1">Keterangan (Sakit, Izin, Cuti, dll)</label>
+                            <input type="text" id="absenceReason" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Ketik alasan di sini...">
+                        </div>
+                        <button id="submitReasonBtn" class="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg">Simpan Keterangan</button>
                     </div>
 
                     <div id="report-tab" class="tab-content hidden space-y-4">
                         <p class="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg border">Tulis laporan kegiatan harian di sini.</p>
-                        <!-- Form Laporan Harian -->
+                        <div>
+                            <label for="reportDate" class="block text-sm font-medium text-gray-600 mb-1">Tanggal Laporan</label>
+                            <input type="date" id="reportDate" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label for="reportText" class="block text-sm font-medium text-gray-600 mb-1">Isi Laporan</label>
+                            <textarea id="reportText" rows="5" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Contoh: Melakukan pengecekan kebersihan area lobi..."></textarea>
+                        </div>
+                        <button id="submitReportBtn" class="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg">Simpan Laporan</button>
                     </div>
 
                     <div id="expense-tab" class="tab-content hidden space-y-4">
                          <p class="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg border">Catat pengeluaran operasional dan unggah foto bukti.</p>
-                         <!-- Form Input Pengeluaran -->
                          <div class="space-y-4">
                             <div>
                                 <label for="expenseDate" class="block text-sm font-medium text-gray-600 mb-1">Tanggal</label>
@@ -135,7 +151,6 @@
                          
                          <hr class="my-6">
 
-                         <!-- BAGIAN BARU: Laporan Pengeluaran Bulanan -->
                          <div class="space-y-4">
                             <h3 class="text-lg font-semibold text-gray-700">Rekap Pengeluaran Bulan Ini</h3>
                             <button id="viewExpenseReportBtn" class="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 px-4 rounded-lg">Lihat Laporan Bulan Ini</button>
@@ -149,9 +164,7 @@
                                                 <th class="p-3 text-right">Jumlah (Rp)</th>
                                             </tr>
                                         </thead>
-                                        <tbody id="expenseReportBody">
-                                            <!-- Data akan diisi oleh JavaScript -->
-                                        </tbody>
+                                        <tbody id="expenseReportBody"></tbody>
                                         <tfoot class="bg-gray-100 font-bold">
                                             <tr>
                                                 <td colspan="2" class="p-3 text-right">Total Pengeluaran:</td>
@@ -172,71 +185,284 @@
         </div>
     </div>
 
-    <!-- Modal Kamera -->
     <div id="cameraModal" class="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4 hidden">
-       <!-- Konten Modal Kamera -->
+        <div class="bg-white p-6 rounded-lg shadow-xl text-center max-w-lg w-full">
+            <h3 id="cameraTitle" class="text-xl font-medium text-gray-700 mb-4"></h3>
+            <div class="relative bg-black rounded-lg overflow-hidden w-full aspect-video mb-4">
+                 <video id="video-container" class="w-full h-full object-cover" autoplay playsinline></video>
+                 <canvas id="canvas" class="hidden"></canvas>
+            </div>
+            <div class="flex gap-4">
+                <button id="captureBtn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg">Ambil Gambar</button>
+                <button id="cancelBtn" class="w-full bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-4 rounded-lg">Batal</button>
+            </div>
+        </div>
     </div>
     
-    <!-- Modal Loading -->
     <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
-        <!-- Konten Modal Loading -->
+        <div class="bg-white p-8 rounded-lg shadow-xl text-center max-w-sm w-full mx-4">
+            <div id="loader" class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4 mx-auto"></div>
+            <h3 id="message" class="text-lg font-medium text-gray-700"></h3>
+        </div>
     </div>
 
     <script>
         // --- PENGATURAN ---
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyV-_XTuHXfuUcw7xhj5f82iByvpPpJwJGGPVP3uE3W1TgArhMsoEHhNHwDxBGJVHLV1A/exec";
+        const OFFICE_LATITUDE = -5.188724546311627;
+        const OFFICE_LONGITUDE = 119.39487657300862;
+        const ALLOWED_RADIUS_METERS = 300; 
+        const MAX_USERS_PER_DEVICE = 3;
         const SUPERVISOR_PASSWORD = "admin123";
-        // ... pengaturan lainnya ...
+        
+        // --- GLOBAL VARIABLES & ELEMENT SELECTORS ---
+        let currentCoordinates = null, isLocationValid = false, currentStream, currentCameraMode = '', receiptPhotoData = null;
+        const getEl = (id) => document.getElementById(id);
+        const clockEl = getEl('clock'), overlay = getEl('overlay'), message = getEl('message');
+        const employeeView = getEl('employee-view'), employeeNameSelect = getEl('employeeNameSelect'), clockInBtn = getEl('clockInBtn'), clockOutBtn = getEl('clockOutBtn');
+        const locationStatus = getEl('locationStatus'), workLocationStatus = getEl('workLocationStatus'), locationError = getEl('locationError'), distanceStatus = getEl('distanceStatus');
+        const supervisorView = getEl('supervisor-view'), supervisorLoginLink = getEl('supervisorLoginLink'), logoutBtn = getEl('logoutBtn');
+        const absenceDate = getEl('absenceDate'), supervisorEmployeeSelect = getEl('supervisorEmployeeSelect'), absenceReason = getEl('absenceReason'), submitReasonBtn = getEl('submitReasonBtn');
+        const reportDate = getEl('reportDate'), reportText = getEl('reportText'), submitReportBtn = getEl('submitReportBtn');
+        const expenseDate = getEl('expenseDate'), expenseDescription = getEl('expenseDescription'), expenseAmount = getEl('expenseAmount'), takeReceiptPhotoBtn = getEl('takeReceiptPhotoBtn'), receiptPreview = getEl('receiptPreview'), submitExpenseBtn = getEl('submitExpenseBtn');
+        const cameraModal = getEl('cameraModal'), video = getEl('video-container'), canvas = getEl('canvas'), captureBtn = getEl('captureBtn'), cancelBtn = getEl('cancelBtn'), cameraTitle = getEl('cameraTitle');
+        const viewExpenseReportBtn = getEl('viewExpenseReportBtn'), expenseReportContainer = getEl('expenseReportContainer'), expenseReportBody = getEl('expenseReportBody'), expenseReportTotal = getEl('expenseReportTotal');
 
-        // --- ELEMEN-ELEMEN BARU ---
-        const viewExpenseReportBtn = document.getElementById('viewExpenseReportBtn');
-        const expenseReportContainer = document.getElementById('expenseReportContainer');
-        const expenseReportBody = document.getElementById('expenseReportBody');
-        const expenseReportTotal = document.getElementById('expenseReportTotal');
+        // --- FUNGSI UTAMA ---
+        function updateClock() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Asia/Makassar', hour12: false };
+            clockEl.textContent = new Intl.DateTimeFormat('id-ID', options).format(now);
+        }
 
-        // --- FUNGSI BARU: Mengambil dan Menampilkan Laporan Pengeluaran ---
+        async function submitData(payload, successMsg) {
+            showOverlay(`Mengirim data...`);
+            try {
+                const response = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload), headers: { "Content-Type": "text/plain;charset=utf-8" } });
+                const result = await response.json();
+                if (result.status === "success") { showOverlayMessage(successMsg || 'Data berhasil dikirim!'); } 
+                else { throw new Error(result.message); }
+            } catch (error) { showOverlayMessage(`Error: ${error.message}`, true);
+            } finally { setTimeout(hideOverlay, 2500); }
+        }
+
+        // --- LOGIKA KARYAWAN ---
+        function initLocation() {
+            if (!navigator.geolocation) { locationStatus.textContent = 'Tidak Didukung'; return; }
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    currentCoordinates = { latitude: position.coords.latitude, longitude: position.coords.longitude };
+                    locationStatus.textContent = 'Ditemukan';
+                    locationStatus.className = 'font-medium text-green-600';
+                    const distance = getDistance(currentCoordinates.latitude, currentCoordinates.longitude, OFFICE_LATITUDE, OFFICE_LONGITUDE);
+                    distanceStatus.textContent = `${distance.toFixed(0)} meter`;
+                    if (distance <= ALLOWED_RADIUS_METERS) {
+                        isLocationValid = true;
+                        workLocationStatus.textContent = 'Di Dalam Area Kerja';
+                        workLocationStatus.className = 'font-medium text-green-600';
+                        clockInBtn.disabled = false; clockOutBtn.disabled = false;
+                        locationError.textContent = '';
+                    } else {
+                        isLocationValid = false;
+                        workLocationStatus.textContent = 'Di Luar Area Kerja';
+                        workLocationStatus.className = 'font-medium text-red-600';
+                        locationError.textContent = `Anda harus berada dalam radius ${ALLOWED_RADIUS_METERS}m.`;
+                    }
+                },
+                () => {
+                    locationStatus.textContent = 'Gagal';
+                    locationError.textContent = 'Gagal mendapat lokasi. Aktifkan GPS dan izinkan akses.';
+                }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+            );
+        }
+
+        function setupAttendance(status) {
+            const employeeName = employeeNameSelect.value;
+            if (!employeeName) { alert('Silakan pilih nama Anda.'); return; }
+            if (!checkDeviceLimit(employeeName)) { alert(`Batas maksimal ${MAX_USERS_PER_DEVICE} karyawan per perangkat tercapai.`); return; }
+            if (!isLocationValid) { alert('Anda tidak berada di lokasi kerja yang diizinkan.'); return; }
+            currentCameraMode = 'selfie';
+            openCamera({facingMode: 'user'}, 'Ambil Foto Selfie');
+        }
+        
+        function checkDeviceLimit(employeeName) {
+            const today = new Date().toISOString().split('T')[0];
+            let deviceLog;
+            try { deviceLog = JSON.parse(localStorage.getItem('attendanceDeviceLog')) || {}; } catch (e) { deviceLog = {}; }
+            if (deviceLog.date !== today) { deviceLog = { date: today, users: [] }; }
+            const usersToday = deviceLog.users || [];
+            if (usersToday.includes(employeeName)) return true;
+            if (usersToday.length >= MAX_USERS_PER_DEVICE) return false;
+            usersToday.push(employeeName);
+            localStorage.setItem('attendanceDeviceLog', JSON.stringify(deviceLog));
+            return true;
+        }
+
+        // --- LOGIKA SUPERVISOR ---
+        function checkPersistentLogin() {
+            const storedToken = localStorage.getItem('supervisorToken');
+            const currentToken = btoa(SUPERVISOR_PASSWORD);
+            if (storedToken && storedToken === currentToken) { showSupervisorView(); }
+        }
+
+        function showSupervisorView() {
+            employeeView.classList.add('hidden');
+            supervisorView.classList.remove('hidden');
+            supervisorLoginLink.classList.add('hidden');
+        }
+
+        function setupSupervisorTabs() {
+            const tabs = document.querySelectorAll('.tab-button');
+            const contents = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    contents.forEach(c => c.classList.add('hidden'));
+                    getEl(`${tab.dataset.tab}-tab`).classList.remove('hidden');
+                });
+            });
+        }
+        
+        async function submitAbsenceReason() {
+            const payload = { action: 'update_reason', employeeName: supervisorEmployeeSelect.value, date: absenceDate.value, reason: absenceReason.value };
+            if (!payload.employeeName || !payload.date || !payload.reason) { alert("Lengkapi tanggal, nama, dan alasan."); return; }
+            await submitData(payload, "Keterangan absen berhasil disimpan!");
+        }
+
+        async function submitDailyReport() {
+            const payload = { action: 'submit_daily_report', date: reportDate.value, report: reportText.value };
+            if (!payload.date || !payload.report) { alert("Lengkapi tanggal dan isi laporan."); return; }
+            await submitData(payload, "Laporan harian berhasil disimpan!");
+            reportText.value = '';
+        }
+
+        async function submitExpense() {
+            const payload = { action: 'submit_expense', date: expenseDate.value, description: expenseDescription.value, amount: expenseAmount.value, receiptPhoto: receiptPhotoData ? receiptPhotoData.split(',')[1] : null };
+            if (!payload.date || !payload.description || !payload.amount || !payload.receiptPhoto) { alert("Lengkapi semua data termasuk foto nota."); return; }
+            await submitData(payload, "Data pengeluaran berhasil disimpan!");
+            expenseDescription.value = ''; expenseAmount.value = '';
+            receiptPreview.classList.add('hidden'); receiptPhotoData = null;
+            submitExpenseBtn.disabled = true;
+        }
+        
         async function fetchAndDisplayExpenses() {
             showOverlay('Mengambil laporan...');
             const payload = { action: 'get_monthly_expenses' };
-            
             try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(payload),
-                    headers: { "Content-Type": "text/plain;charset=utf-8" }
-                });
+                const response = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload), headers: { "Content-Type": "text/plain;charset=utf-8" } });
                 const result = await response.json();
-                
                 if (result.status === "success") {
-                    expenseReportBody.innerHTML = ''; // Kosongkan tabel
+                    expenseReportBody.innerHTML = '';
                     if (result.data.expenses.length === 0) {
-                        expenseReportBody.innerHTML = '<tr><td colspan="3" class="p-3 text-center text-gray-500">Belum ada data pengeluaran bulan ini.</td></tr>';
+                        expenseReportBody.innerHTML = '<tr><td colspan="3" class="p-3 text-center text-gray-500">Belum ada data bulan ini.</td></tr>';
                     } else {
                         result.data.expenses.forEach(exp => {
-                            const row = `<tr>
-                                <td class="p-3">${exp.date}</td>
-                                <td class="p-3">${exp.description}</td>
-                                <td class="p-3 text-right">${exp.amount.toLocaleString('id-ID')}</td>
-                            </tr>`;
+                            const row = `<tr><td class="p-3">${exp.date}</td><td class="p-3">${exp.description}</td><td class="p-3 text-right">${exp.amount.toLocaleString('id-ID')}</td></tr>`;
                             expenseReportBody.innerHTML += row;
                         });
                     }
                     expenseReportTotal.textContent = `Rp ${result.data.total.toLocaleString('id-ID')}`;
                     expenseReportContainer.classList.remove('hidden');
                     hideOverlay();
-                } else {
-                    throw new Error(result.message);
-                }
-            } catch (error) {
-                showOverlayMessage(`Error: ${error.message}`, true);
-                setTimeout(hideOverlay, 2500);
-            }
+                } else { throw new Error(result.message); }
+            } catch (error) { showOverlayMessage(`Error: ${error.message}`, true); setTimeout(hideOverlay, 2500); }
         }
 
-        // --- EVENT LISTENER BARU ---
-        viewExpenseReportBtn.addEventListener('click', fetchAndDisplayExpenses);
+        // --- LOGIKA KAMERA ---
+        async function openCamera(constraints, title) {
+            cameraTitle.textContent = title;
+            try {
+                currentStream = await navigator.mediaDevices.getUserMedia({ video: constraints, audio: false });
+                video.srcObject = currentStream;
+                video.style.transform = constraints.facingMode === 'user' ? 'scaleX(-1)' : 'scaleX(1)';
+                cameraModal.classList.remove('hidden');
+            } catch (err) { alert('Gagal mengakses kamera. Izinkan akses kamera.'); }
+        }
 
-        // ... sisa kode JavaScript Anda yang sudah ada ...
+        function closeCamera() {
+            if (currentStream) { currentStream.getTracks().forEach(track => track.stop()); }
+            cameraModal.classList.add('hidden');
+        }
+
+        // --- INISIALISASI & EVENT LISTENERS ---
+        window.addEventListener('load', () => {
+            populateSupervisorSelect(); initLocation(); updateClock(); setInterval(updateClock, 1000);
+            setupSupervisorTabs(); checkPersistentLogin();
+            const today = new Date().toISOString().split('T')[0];
+            absenceDate.value = today; reportDate.value = today; expenseDate.value = today;
+        });
+
+        supervisorLoginLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            const password = prompt("Masukkan kata sandi supervisor:");
+            if (password === SUPERVISOR_PASSWORD) {
+                showSupervisorView();
+                localStorage.setItem('supervisorToken', btoa(SUPERVISOR_PASSWORD));
+            } else if (password) { alert("Kata sandi salah."); }
+        });
+        logoutBtn.addEventListener('click', () => {
+             supervisorView.classList.add('hidden'); employeeView.classList.remove('hidden');
+             supervisorLoginLink.classList.remove('hidden');
+             localStorage.removeItem('supervisorToken');
+        });
+
+        // Event Listener Tombol Supervisor
+        submitReasonBtn.addEventListener('click', submitAbsenceReason);
+        submitReportBtn.addEventListener('click', submitDailyReport);
+        takeReceiptPhotoBtn.addEventListener('click', () => { currentCameraMode = 'receipt'; openCamera({facingMode: 'environment'}, 'Ambil Foto Nota'); });
+        submitExpenseBtn.addEventListener('click', submitExpense);
+        viewExpenseReportBtn.addEventListener('click', fetchAndDisplayExpenses);
+        
+        // Event Listener Tombol Karyawan
+        clockInBtn.addEventListener('click', () => setupAttendance('Jam Datang'));
+        clockOutBtn.addEventListener('click', () => setupAttendance('Jam Pulang'));
+        
+        // Event Listener Tombol Kamera Universal
+        captureBtn.addEventListener('click', () => {
+            canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+            const context = canvas.getContext('2d');
+            if(currentCameraMode === 'selfie') { context.scale(-1, 1); context.drawImage(video, -canvas.width, 0, canvas.width, canvas.height); } 
+            else { context.drawImage(video, 0, 0, canvas.width, canvas.height); }
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+            closeCamera();
+            
+            if (currentCameraMode === 'selfie') {
+                const payload = { action: 'submit_attendance', employeeName: employeeNameSelect.value, status: document.activeElement.id === 'clockInBtn' ? 'Jam Datang' : 'Jam Pulang', latitude: currentCoordinates.latitude, longitude: currentCoordinates.longitude, selfie: dataUrl.split(',')[1] };
+                submitData(payload, "Absensi berhasil terkirim!");
+                employeeNameSelect.value = '';
+            } else if (currentCameraMode === 'receipt') {
+                receiptPhotoData = dataUrl;
+                receiptPreview.src = dataUrl;
+                receiptPreview.classList.remove('hidden');
+                submitExpenseBtn.disabled = false;
+            }
+        });
+        cancelBtn.addEventListener('click', closeCamera);
+        
+        // --- FUNGSI BANTUAN LAIN ---
+        function populateSupervisorSelect() {
+            const options = Array.from(employeeNameSelect.options);
+            supervisorEmployeeSelect.innerHTML = '';
+            options.forEach(option => supervisorEmployeeSelect.add(option.cloneNode(true)));
+        }
+        function getDistance(lat1, lon1, lat2, lon2) {
+             const R = 6371e3; const toRad = (v) => v * Math.PI / 180;
+             const dLat = toRad(lat2 - lat1); const dLon = toRad(lon2 - lon1);
+             const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+             return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        }
+        function showOverlayMessage(msg, isError = false) {
+             message.textContent = msg;
+             message.className = `text-lg font-medium ${isError ? 'text-red-600' : 'text-gray-700'}`;
+             getEl('loader').style.display = 'none';
+        }
+        function showOverlay(msg) {
+             message.textContent = msg;
+             getEl('loader').style.display = 'block';
+             overlay.classList.remove('hidden');
+        }
+        function hideOverlay() { overlay.classList.add('hidden'); }
     </script>
 </body>
 </html>
